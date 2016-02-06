@@ -98,9 +98,9 @@ class ReflexAgent(Agent):
         closeGhostScore = 0;
 
         if (distanceToClosestGhost < 4):
-            closeGhostScore = (4 - distanceToClosestGhost) * 3;
+            closeGhostScore = (4 - distanceToClosestGhost) * 3000;
 
-        score = - numberOfFood * 5 - distanceToClosestFood - closeGhostScore;
+        score = - numberOfFood * 1000 - distanceToClosestFood - closeGhostScore;
 
         # print ('Score is ' + str(score))
 
