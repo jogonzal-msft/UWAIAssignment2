@@ -291,6 +291,37 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
       Your expectimax agent (question 4)
     """
 
+    Infinity = 9999999999999999999;
+
+    def nextAgent(self, successor, depth, agentIndex, numAgents):
+        agentIndex += 1;
+        if (agentIndex >= numAgents):
+            agentIndex = 0;
+            depth += 1;
+
+        if (depth == self.depth or successor.isWin() or successor.isLose()):
+            score = self.evaluationFunction(successor);
+            return (None, score);
+        else:
+            return self.Value(successor, depth, agentIndex, numAgents);
+
+    def Value(self, state, depth, agentIndex, numAgents):
+        legalActions = state.getLegalActions(agentIndex);
+        value = -self.Infinity;
+        bestAction = None;
+        countOfActions = len(legalActions);
+        actionProbability = 1.0 / countOfActions;
+        accumulated = 0;
+        for action in legalActions:
+            successor = state.generateSuccessor(agentIndex, action);
+            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents)[1];
+            localAccumulated = actionProbability * nextAgentValues;
+            if (localAccumulated >= value):
+                value = localAccumulated;
+                bestAction = action;
+            accumulated += localAccumulated;
+        return (bestAction, accumulated);
+
     def getAction(self, gameState):
         """
           Returns the expectimax action using self.depth and self.evaluationFunction
@@ -298,8 +329,11 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
           All ghosts should be modeled as choosing uniformly at random from their
           legal moves.
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        numAgents = gameState.getNumAgents();
+
+        bestChoice = self.nextAgent(gameState, 0, -1, numAgents);
+        return bestChoice[0];
 
 def betterEvaluationFunction(currentGameState):
     """
