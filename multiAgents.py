@@ -18,6 +18,60 @@ import random, util
 
 from game import Agent
 
+def customEvaluationFunction(gameState):
+    """
+    Design a better evaluation function here.
+
+    The evaluation function takes in the current and proposed successor
+    GameStates (pacman.py) and returns a number, where higher numbers are better.
+
+    The code below extracts some useful information from the state, like the
+    remaining food (newFood) and Pacman position after moving (newPos).
+    newScaredTimes holds the number of moves that each ghost will remain
+    scared because of Pacman having eaten a power pellet.
+
+    Print out these variables to see what you're getting, then combine them
+    to create a masterful evaluation function.
+    """
+    # Useful information you can extract from a GameState (pacman.py)
+    newPos = gameState.getPacmanPosition()
+    newFood = gameState.getFood()
+    newFoodAsList = newFood.asList();
+    newGhostStates = gameState.getGhostStates()
+    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
+
+    distanceToClosestFood = -1;
+    distanceToClosestGhost = -1;
+    numberOfFood = len(newFoodAsList);
+
+    for ghost in newGhostStates:
+        ghostPosition = ghost.configuration.pos;
+        ghostDirection = ghost.configuration.direction;
+        ghostScaredRemainingTime = ghost.scaredTimer;
+        distanceToGhost = manhattanDistance(newPos, ghostPosition);
+        canEatGhost = (ghostScaredRemainingTime > distanceToGhost);
+        if ((not canEatGhost) and (distanceToClosestGhost == -1 or distanceToGhost < distanceToClosestGhost)):
+            distanceToClosestGhost = distanceToGhost;
+
+    for food in newFoodAsList:
+        distanceToFood = manhattanDistance(food, newPos);
+        if (distanceToClosestFood == -1 or distanceToFood < distanceToClosestFood):
+            distanceToClosestFood = distanceToFood;
+
+    # For reference, see the past score
+    pastScore = gameState.getScore()
+
+    closeGhostScore = 0;
+
+    if (distanceToClosestGhost < 4):
+        closeGhostScore = (4 - distanceToClosestGhost) * 3000;
+
+    score = - numberOfFood * 1000 - distanceToClosestFood - closeGhostScore;
+
+    # print ('Score is ' + str(score))
+
+    return score;
+
 class ReflexAgent(Agent):
     """
       A reflex agent chooses an action at each choice point by examining
@@ -67,42 +121,10 @@ class ReflexAgent(Agent):
         to create a masterful evaluation function.
         """
         # Useful information you can extract from a GameState (pacman.py)
-        successorGameState = currentGameState.generatePacmanSuccessor(action)
-        newPos = successorGameState.getPacmanPosition()
-        newFood = successorGameState.getFood()
-        newFoodAsList = newFood.asList();
-        newGhostStates = successorGameState.getGhostStates()
-        newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
-        distanceToClosestFood = -1;
-        distanceToClosestGhost = -1;
-        numberOfFood = len(newFoodAsList);
+        gameState = currentGameState.generatePacmanSuccessor(action)
 
-        for ghost in newGhostStates:
-            ghostPosition = ghost.configuration.pos;
-            ghostDirection = ghost.configuration.direction;
-            ghostScaredRemainingTime = ghost.scaredTimer;
-            distanceToGhost = manhattanDistance(newPos, ghostPosition);
-            canEatGhost = (ghostScaredRemainingTime > distanceToGhost);
-            if ((not canEatGhost) and (distanceToClosestGhost == -1 or distanceToGhost < distanceToClosestGhost)):
-                distanceToClosestGhost = distanceToGhost;
-
-        for food in newFoodAsList:
-            distanceToFood = manhattanDistance(food, newPos);
-            if (distanceToClosestFood == -1 or distanceToFood < distanceToClosestFood):
-                distanceToClosestFood = distanceToFood;
-
-        # For reference, see the past score
-        pastScore = successorGameState.getScore()
-
-        closeGhostScore = 0;
-
-        if (distanceToClosestGhost < 4):
-            closeGhostScore = (4 - distanceToClosestGhost) * 3000;
-
-        score = - numberOfFood * 1000 - distanceToClosestFood - closeGhostScore;
-
-        # print ('Score is ' + str(score))
+        return customEvaluationFunction(gameState);
 
         return score;
 
@@ -340,9 +362,11 @@ def betterEvaluationFunction(currentGameState):
       Your extreme ghost-hunting, pellet-nabbing, food-gobbling, unstoppable
       evaluation function (question 5).
 
-      DESCRIPTION: <write something here so we know what you did>
+      DESCRIPTION: Minimax with alpha beta pruning with depth 5
     """
+
     "*** YOUR CODE HERE ***"
+    
     util.raiseNotDefined()
 
 # Abbreviation
