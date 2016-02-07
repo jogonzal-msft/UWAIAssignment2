@@ -237,10 +237,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         bestAction = None;
         for action in legalActions:
             successor = state.generateSuccessor(agentIndex, action);
-            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents)[1];
+            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents, alpha, beta)[1];
             if (nextAgentValues > value):
                 value = nextAgentValues;
                 bestAction = action;
+            #Alpha beta pruning shortcut
+            if (value > beta):
+                return (bestAction, value);
+            alpha = max(alpha, value);
         return (bestAction, value);
 
     def MinValue(self, state, depth, agentIndex, numAgents, alpha, beta):
@@ -249,10 +253,14 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         bestAction = None;
         for action in legalActions:
             successor = state.generateSuccessor(agentIndex, action);
-            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents)[1];
+            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents, alpha, beta)[1];
             if (nextAgentValues < value):
                 value = nextAgentValues;
                 bestAction = action;
+            #Alpha beta pruning shortcut
+            if (value < alpha):
+                return (bestAction, value);
+            beta = min(beta, value);
         return (bestAction, value);
 
     def getAction(self, gameState):
@@ -275,7 +283,7 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
 
         numAgents = gameState.getNumAgents();
 
-        bestChoice = self.nextAgent(gameState, 0, -1, numAgents);
+        bestChoice = self.nextAgent(gameState, 0, -1, numAgents, -self.Infinity, self.Infinity);
         return bestChoice[0];
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
