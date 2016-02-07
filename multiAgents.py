@@ -379,7 +379,6 @@ def betterEvaluationFunction(currentGameState):
     newFood = currentGameState.getFood()
     newFoodAsList = newFood.asList();
     newGhostStates = currentGameState.getGhostStates()
-    newScaredTimes = [ghostState.scaredTimer for ghostState in newGhostStates]
 
     distanceToClosestFood = -1;
     distanceToClosestGhost = -1;
@@ -387,20 +386,14 @@ def betterEvaluationFunction(currentGameState):
 
     for ghost in newGhostStates:
         ghostPosition = ghost.configuration.pos;
-        ghostDirection = ghost.configuration.direction;
-        ghostScaredRemainingTime = ghost.scaredTimer;
         distanceToGhost = manhattanDistance(newPos, ghostPosition);
-        canEatGhost = (ghostScaredRemainingTime > distanceToGhost);
-        if ((not canEatGhost) and (distanceToClosestGhost == -1 or distanceToGhost < distanceToClosestGhost)):
+        if ((distanceToClosestGhost == -1 or distanceToGhost < distanceToClosestGhost)):
             distanceToClosestGhost = distanceToGhost;
 
     for food in newFoodAsList:
         distanceToFood = manhattanDistance(food, newPos);
         if (distanceToClosestFood == -1 or distanceToFood < distanceToClosestFood):
             distanceToClosestFood = distanceToFood;
-
-    # For reference, see the past score
-    pastScore = currentGameState.getScore()
 
     closeGhostScore = 0;
 
