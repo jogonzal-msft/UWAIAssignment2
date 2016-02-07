@@ -367,6 +367,12 @@ def betterEvaluationFunction(currentGameState):
       evaluation function (question 5).
 
       DESCRIPTION: Use the same function as in question 1, but without applying an action
+      Calculate shortest distance to food
+      Calculate total food
+      Calculate shortest distance to ghost
+      Add them, with the following importance:
+      TotalFood * 1000 + distanceToFood * 1 + distanceToGhost * 2000
+      ** The distance to ghost only matters if it is smaller than 4
     """
 
     newPos = currentGameState.getPacmanPosition()
