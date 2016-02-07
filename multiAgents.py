@@ -213,12 +213,70 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
       Your minimax agent with alpha-beta pruning (question 3)
     """
 
+    Infinity = 9999999999999999999;
+
+    def nextAgent(self, successor, depth, agentIndex, numAgents, alpha, beta):
+        agentIndex += 1;
+        if (agentIndex >= numAgents):
+            agentIndex = 0;
+            depth += 1;
+
+        if (depth == self.depth or successor.isWin() or successor.isLose()):
+            score = self.evaluationFunction(successor);
+            return (None, score);
+        else:
+            isPacman = agentIndex == 0;
+            if (isPacman):
+                return self.MaxValue(successor, depth, agentIndex, numAgents, alpha, beta);
+            else:
+                return self.MinValue(successor, depth, agentIndex, numAgents, alpha, beta);
+
+    def MaxValue(self, state, depth, agentIndex, numAgents, alpha, beta):
+        legalActions = state.getLegalActions(agentIndex);
+        value = -self.Infinity;
+        bestAction = None;
+        for action in legalActions:
+            successor = state.generateSuccessor(agentIndex, action);
+            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents)[1];
+            if (nextAgentValues > value):
+                value = nextAgentValues;
+                bestAction = action;
+        return (bestAction, value);
+
+    def MinValue(self, state, depth, agentIndex, numAgents, alpha, beta):
+        legalActions = state.getLegalActions(agentIndex);
+        value = self.Infinity;
+        bestAction = None;
+        for action in legalActions:
+            successor = state.generateSuccessor(agentIndex, action);
+            nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents)[1];
+            if (nextAgentValues < value):
+                value = nextAgentValues;
+                bestAction = action;
+        return (bestAction, value);
+
     def getAction(self, gameState):
         """
-          Returns the minimax action using self.depth and self.evaluationFunction
+          Returns the minimax action from the current gameState using self.depth
+          and self.evaluationFunction.
+
+          Here are some method calls that might be useful when implementing minimax.
+
+          gameState.getLegalActions(agentIndex):
+            Returns a list of legal actions for an agent
+            agentIndex=0 means Pacman, ghosts are >= 1
+
+          gameState.generateSuccessor(agentIndex, action):
+            Returns the successor game state after an agent takes an action
+
+          gameState.getNumAgents():
+            Returns the total number of agents in the game
         """
-        "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        numAgents = gameState.getNumAgents();
+
+        bestChoice = self.nextAgent(gameState, 0, -1, numAgents);
+        return bestChoice[0];
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
