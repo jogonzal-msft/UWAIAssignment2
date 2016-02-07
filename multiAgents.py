@@ -321,12 +321,16 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
             agentIndex = 0;
             depth += 1;
 
+        isPacman = agentIndex == 0;
         if (depth == self.depth or successor.isWin() or successor.isLose()):
             score = self.evaluationFunction(successor);
             return (None, score);
         else:
-            return self.Value(successor, depth, agentIndex, numAgents);
-
+            value = self.Value(successor, depth, agentIndex, numAgents);
+            if (isPacman):
+                return (value[0], value[2]);
+            else:
+                return (value[0], value[1]);
     def Value(self, state, depth, agentIndex, numAgents):
         legalActions = state.getLegalActions(agentIndex);
         value = -self.Infinity;
@@ -337,12 +341,12 @@ class ExpectimaxAgent(MultiAgentSearchAgent):
         for action in legalActions:
             successor = state.generateSuccessor(agentIndex, action);
             nextAgentValues = self.nextAgent(successor, depth, agentIndex, numAgents)[1];
-            localAccumulated = actionProbability * nextAgentValues;
+            localAccumulated = nextAgentValues;
             if (localAccumulated >= value):
                 value = localAccumulated;
                 bestAction = action;
-            accumulated += localAccumulated;
-        return (bestAction, accumulated);
+            accumulated += actionProbability * localAccumulated;
+        return (bestAction, accumulated, value);
 
     def getAction(self, gameState):
         """
